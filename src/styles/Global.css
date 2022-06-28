@@ -1,0 +1,8 @@
+.footer {
+    background: #ecf5fe;
+}
+
+.footer .report-problem {
+    position: absolute;
+    right: 5px;
+}
