@@ -3,6 +3,7 @@ const jwt = require("jsonwebtoken");
 const auth = async (req, res, next) => {
   try {
     const token = req.header("user-auth-token");
+    console.log(token);
     if (!token)
       return res.status(401).json({
         msg: "No token, authorization denied",
@@ -13,10 +14,13 @@ const auth = async (req, res, next) => {
       return res.status(401).json({
         msg: "Token is not valid",
       });
-    req.user = decoded.userId;
+    req.user = decoded.user.userId;
+    console.log(req.user, "auth");
     next();
   } catch (err) {
     console.error(err.message);
     res.status(500).send("Server Error");
   }
 };
+
+module.exports = auth;
