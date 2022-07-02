@@ -2,6 +2,7 @@ const Track = require("../models/Track");
 const User = require("../models/User");
 
 const updatePrices = () => {
+  console.log("Updating prices...");
   Track.find({}, (err, tracks) => {
     if (err) {
       console.log(err);
