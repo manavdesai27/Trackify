@@ -71,14 +71,29 @@ exports.loginUser = async (req, res) => {
 exports.getUser = async (req, res, next) => {
   try {
     const user = await User.findById(req.user).populate("addedUrls");
-    console.log(user);
-    console.log(req.user);
     res.json({
       userId: user.id,
       displayName: user.name,
       email: user.email,
       addedUrls: user.addedUrls,
-    });
+    }); 
+  } catch (err) {
+    return res.status(500).json({ error: err.message });
+  }
+};
+
+exports.validateToken = async (req, res, next) => {
+  try {
+    const token = req.header("user-auth-token");
+    if (!token) return res.json(false);
+
+    const verified = jwt.verify(token, process.env.JWT_SECRET);
+    if (!verified) return res.json(false);
+
+    const user = await User.findById(verified.user.userId);
+    if (!user) return res.json(false);
+
+    return res.json(true);
   } catch (err) {
     return res.status(500).json({ error: err.message });
   }

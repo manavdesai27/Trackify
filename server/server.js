@@ -13,13 +13,13 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 
 const userRouter = require("./routes/user.route");
-app.use("/api/users", userRouter);
+app.use("/api/user", userRouter);
 
 const trackRouter = require("./routes/track.route");
 const { updatePrices } = require("./util/updatePrices");
-app.use("/api", trackRouter);
+app.use("/api/dashboard", trackRouter);
 
 const port = process.env.PORT || 5000;
 app.listen(port, console.log(`Server started on port ${port}`));
 
-cron.schedule('0 8 * * *', updatePrices);
+cron.schedule("0 10 * * *", updatePrices);

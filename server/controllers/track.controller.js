@@ -10,8 +10,6 @@ exports.postTrack = async (req, res) => {
     let price = 0;
     let image = "";
 
-    console.log(trackUrl);
-
     if (trackUrl.includes("amazon.in")) {
       //crawl amazon
       console.log(`Crawling ${trackUrl}`.green.underline.bold);
@@ -35,7 +33,6 @@ exports.postTrack = async (req, res) => {
 
       price = $("._16Jk6d").text();
       image = $("._396QI4").first().attr("src");
-      image = image.replace("/image/0/0/", "/image/500/500/");
 
       console.log(`Image: ${image}`.green.underline.bold);
 
@@ -78,12 +75,38 @@ exports.postTrack = async (req, res) => {
   }
 };
 
+exports.editTrack = async (req, res) => {
+  try {
+    const {
+      name,
+      reqPrice,
+    } = req.body;
+
+    const track = await Track.findById(req.params.id);
+
+    track.name = name;
+    track.reqPrice = reqPrice;
+    await track.save();
+
+    return res.status(200).json({
+      success: true,
+      data: track,
+    });
+  }
+  catch(err) {
+    console.log(err);
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+    });
+  }
+}
+
 exports.deleteTracks = async (req, res) => {
   try {
-    const { userId, selectedtrackIds } = req.body;
-
+    const { userId, selectedTracks } = req.body;
     const user = await User.findById(userId);
-    const trackids = selectedtrackIds.map((track) => track._id);
+    const trackids = selectedTracks.map((track) => track._id);
     const tracks = await Track.find({
       _id: {
         $in: trackids,
@@ -98,9 +121,12 @@ exports.deleteTracks = async (req, res) => {
 
     trackids.forEach(async (trackid) => {
       const index = user.addedUrls.indexOf(trackid);
-      user.addedUrls.splice(index, 1);
-      await user.save();
+      if (index > -1) {
+        user.addedUrls.splice(index, 1);
+      }
     });
+
+    await user.save();
 
     return res.status(200).json({
       success: true,

@@ -1,5 +1,16 @@
 const Track = require("../models/Track");
 const User = require("../models/User");
+const axios = require("axios").default;
+const cheerio = require("cheerio");
+const nodemailer = require("nodemailer");
+
+let transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
+  },
+});
 
 const updatePrices = () => {
   console.log("Updating prices...");
@@ -8,14 +19,10 @@ const updatePrices = () => {
       console.log(err);
     } else {
       tracks.forEach(async (track) => {
-        const { url, currentPrice, reqPrice, user } = track;
+        const { url, currentPrice, reqPrice, user, name } = track;
         const selectedUserEmail = User.findById(user).email;
 
-        let price = 0;
-        let image = "";
-
-        console.log(url);
-
+        let price = 0;        
         if (url.includes("amazon.in")) {
           //crawl amazon
           console.log(`Crawling ${url}`.green.underline.bold);
@@ -23,8 +30,6 @@ const updatePrices = () => {
           const $ = cheerio.load(html.data);
 
           price = $(".a-price-whole").first().text();
-          image = $("#landingImage").attr("src");
-          console.log(`Image: ${image}`.green.underline.bold);
 
           console.log(
             `${name} price: ${parseFloat(price.replace(/[^0-9\.-]+/g, ""))}`
@@ -38,10 +43,6 @@ const updatePrices = () => {
           const $ = cheerio.load(html.data);
 
           price = $("._16Jk6d").text();
-          image = $("._396QI4").first().attr("src");
-          image = image.replace("/image/0/0/", "/image/500/500/");
-
-          console.log(`Image: ${image}`.green.underline.bold);
 
           console.log(
             `${name} price: ${parseFloat(price.replace(/[^0-9\.-]+/g, ""))}`
@@ -50,16 +51,33 @@ const updatePrices = () => {
           console.log(`Crawling ends...`.red.bold);
         }
 
+        price = parseFloat(price.replace(/[^0-9\.-]+/g, ""));
+
+        if(price<=reqPrice){
+          //send email
+          console.log(`Sending email to ${selectedUserEmail}`.green.underline.bold);
+          let mailOptions = {
+            from: "manavtech27@gmail.com",
+            to: selectedUserEmail,
+            subject: "Price dropped for "+name,
+            text: "Price changed for ${url} to ${price}",
+          }
+          
+          transporter.sendMail(mailOptions, function (error, info) {
+            if (error) {
+              console.log(error);
+            } else {
+              console.log("Email sent: " + info.response);
+            }
+          })
+        }
+
         if (price != currentPrice) {
           track.currentPrice = price;
           track.save();
           console.log(
             `${selectedUserEmail} price updated`.green.underline.bold
           );
-        }
-
-        if(price <= reqPrice) {
-          console.log(`${selectedUserEmail} price reached`.green.underline.bold);
         }
       });
     }
