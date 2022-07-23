@@ -1,5 +1,3 @@
-import { Redirect } from "react-router-dom";
-
 export default (state, action) => {
   switch (action.type) {
     case "LOGIN_USER":

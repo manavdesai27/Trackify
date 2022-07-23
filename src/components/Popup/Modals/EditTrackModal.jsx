@@ -3,7 +3,7 @@ import { GlobalContext } from "../../../context/GlobalState";
 import FlashMessage from "react-flash-message";
 
 export default function EditTrackModal({ handleClose, track }) {
-  const { user, editTrack } = useContext(GlobalContext);
+  const { editTrack } = useContext(GlobalContext);
   const [trackName, setTrackName] = useState(track.name);
   const [trackExpectedPrice, setTrackExpectedPrice] = useState(
     track.expectedPrice

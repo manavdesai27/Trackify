@@ -1,19 +1,16 @@
-import React, { useContext, useState, useEffect } from "react";
+import React, { useContext, useState } from "react";
 import PopupBtn from "../Popup/PopupBtn";
 import { GlobalContext } from "../../context/GlobalState";
-import { Button } from "react-bootstrap";
 import axios from "axios";
 
 export default function UserPanel() {
-  const { user, token, checkLoggedIn } = useContext(GlobalContext);
+  const { user, token } = useContext(GlobalContext);
   const [selectedTracks, setSelectedTracks] = useState([]);
   const createdTracks = user.addedUrls;
 
   // useEffect(() => {
   //   checkLoggedIn();
   // }, [createdTracks]);
-
-  const [isChecked, setIsChecked] = useState(true);
 
   const handleVisitButton = (e, track) => {
     window.open(track.url, "_blank");

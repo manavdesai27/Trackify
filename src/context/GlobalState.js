@@ -1,7 +1,6 @@
 import React, { createContext, useReducer, useEffect } from "react";
 import AppReducer from "./AppReducer";
 import axios from "axios";
-import { Redirect } from "react-router-dom";
 
 // Initial state
 const initialState = {
