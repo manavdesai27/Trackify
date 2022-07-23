@@ -26,10 +26,13 @@ export const GlobalProvider = ({ children }) => {
         payload: true,
       });
 
-      const res = await axios.post("/api/user/login", {
-        email,
-        password,
-      });
+      const res = await axios.post(
+        `${process.env.REACT_APP_BACKEND_URL}/api/user/login`,
+        {
+          email,
+          password,
+        }
+      );
 
       const { token, user } = res.data.data;
       console.log(token, user, "token and user");
@@ -84,7 +87,7 @@ export const GlobalProvider = ({ children }) => {
         payload: true,
       });
 
-      await axios.post("/api/user/register", {
+      await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/user/register`, {
         name: displayName,
         email,
         password,
@@ -137,7 +140,7 @@ export const GlobalProvider = ({ children }) => {
   async function addTrack(trackUrl, name, expectedPrice) {
     try {
       const res = await axios.post(
-        "/api/dashboard/track",
+        `${process.env.REACT_APP_BACKEND_URL}/api/dashboard/track`,
         {
           userId: state.user.userId,
           trackUrl,
@@ -205,7 +208,7 @@ export const GlobalProvider = ({ children }) => {
 
       if (state.user.email !== "tester@mail.com") {
         await axios.post(
-          `/api/dashboard/track/${id}`,
+          `${process.env.REACT_APP_BACKEND_URL}/api/dashboard/track/${id}`,
           {
             name,
             reqPrice: expectedPrice,
@@ -257,7 +260,7 @@ export const GlobalProvider = ({ children }) => {
         console.log(selectedTracks);
         // backend update
         await axios.post(
-          `/api/dashboard/delete/tracks`,
+          `${process.env.REACT_APP_BACKEND_URL}/api/dashboard/delete/tracks`,
           { userId: state.user.userId, selectedTracks },
           { headers: { "user-auth-token": state.token } }
         );
@@ -332,7 +335,7 @@ export const GlobalProvider = ({ children }) => {
         });
       } else if (state.user.addedUrls.length > 0) {
         const res = await axios.post(
-          "http://localhost:5000/api/dashboard/multiTrack",
+          `${process.env.REACT_APP_BACKEND_URL}/api/dashboard/multiTrack`,
           {
             userId: state.user.userId,
             createdTracks: state.user.addedUrls,
@@ -397,14 +400,21 @@ export const GlobalProvider = ({ children }) => {
         token = "";
       }
 
-      const tokenRes = await axios.post("/api/user/tokenIsValid", null, {
-        headers: { "user-auth-token": token },
-      });
+      const tokenRes = await axios.post(
+        `${process.env.REACT_APP_BACKEND_URL}/api/user/tokenIsValid`,
+        null,
+        {
+          headers: { "user-auth-token": token },
+        }
+      );
       // get and login user data
       if (tokenRes.data) {
-        const userRes = await axios.get("/api/user/", {
-          headers: { "user-auth-token": token },
-        });
+        const userRes = await axios.get(
+          `${process.env.REACT_APP_BACKEND_URL}/api/user/`,
+          {
+            headers: { "user-auth-token": token },
+          }
+        );
 
         dispatch({
           type: "LOGIN_USER",

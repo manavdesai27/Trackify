@@ -24,7 +24,7 @@ export default function UserPanel() {
     slider.checked = !slider.checked;
 
     await axios.post(
-      `http://localhost:5000/api/dashboard/notif/track/${id}`,
+      `${process.env.REACT_APP_BACKEND_URL}/api/dashboard/notif/track/${id}`,
       {
         notification: slider.checked,
       },
