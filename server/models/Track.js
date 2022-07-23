@@ -21,6 +21,11 @@ const trackSchema = new mongoose.Schema({
         type: Number,
         required: true,
     },
+    notification: {
+        type: Boolean,
+        required: true,
+        default: false,
+    },
     user: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Users",

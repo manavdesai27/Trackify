@@ -32,8 +32,9 @@ exports.postTrack = async (req, res) => {
       const $ = cheerio.load(html.data);
 
       price = $("._16Jk6d").text();
+      price.replace("₹", "");
       image = $("._396QI4").first().attr("src");
-
+      image = image.replace("/image/0/0/", "/image/200/200/");
       console.log(`Image: ${image}`.green.underline.bold);
 
       console.log(
@@ -77,10 +78,7 @@ exports.postTrack = async (req, res) => {
 
 exports.editTrack = async (req, res) => {
   try {
-    const {
-      name,
-      reqPrice,
-    } = req.body;
+    const { name, reqPrice } = req.body;
 
     const track = await Track.findById(req.params.id);
 
@@ -92,15 +90,37 @@ exports.editTrack = async (req, res) => {
       success: true,
       data: track,
     });
-  }
-  catch(err) {
+  } catch (err) {
     console.log(err);
     return res.status(500).json({
       success: false,
       message: "Internal Server Error",
     });
   }
-}
+};
+
+exports.enableNotifications = async (req, res) => {
+  try {
+    const { notification } = req.body;
+    const track = await Track.findById(req.params.id);
+    console.log(track.notification, notification);
+
+    track.notification = notification;
+
+    await track.save();
+
+    return res.status(200).json({
+      success: true,
+      data: track,
+    });
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+    });
+  }
+};
 
 exports.deleteTracks = async (req, res) => {
   try {
@@ -139,4 +159,12 @@ exports.deleteTracks = async (req, res) => {
       message: "Internal Server Error",
     });
   }
+};
+
+exports.multiTrack = async (req, res) => {
+  const { userId, createdTracks } = req.body;
+  const user = await User.findById(userId);
+  const trackids = createdTracks.map((track) => track._id);
+
+  // Recrawl all the tracks
 };

@@ -19,7 +19,7 @@ const updatePrices = () => {
       console.log(err);
     } else {
       tracks.forEach(async (track) => {
-        const { url, currentPrice, reqPrice, user, name } = track;
+        const { url, currentPrice, reqPrice, user, name, notification } = track;
         const selectedUserEmail = User.findById(user).email;
 
         let price = 0;        
@@ -53,7 +53,7 @@ const updatePrices = () => {
 
         price = parseFloat(price.replace(/[^0-9\.-]+/g, ""));
 
-        if(price<=reqPrice){
+        if(price<=reqPrice && notification && currentPrice>reqPrice){
           //send email
           console.log(`Sending email to ${selectedUserEmail}`.green.underline.bold);
           let mailOptions = {

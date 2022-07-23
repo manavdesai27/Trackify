@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import { GlobalContext } from "../../context/GlobalState";
 import Modal from "@material-ui/core/Modal";
@@ -29,16 +29,27 @@ export default function PopupBtn({
 }) {
   const classes = useStyles();
   const { token } = useContext(GlobalContext);
+  const { checkLoggedIn } = useContext(GlobalContext);
 
   const [open, setOpen] = useState(false);
   const [isSignUp, setIsSignUp] = useState(type === "signUp");
 
+  const [image, setImage] = useState(heroVector);
+
   const handleOpen = () => {
     setOpen(true);
+    if (track) {
+      setImage(track.image);
+    }
   };
   const handleClose = () => {
     setOpen(false);
   };
+
+  useEffect(() => {
+    console.log("Popupbtn useEffect");
+    checkLoggedIn();
+  }, [open]);
 
   function handleSwitchType() {
     setIsSignUp((prevIsSignUp) => !prevIsSignUp);
@@ -68,11 +79,13 @@ export default function PopupBtn({
                 (type === "deleteTrack" || type === "multiTrack") && "bg-white"
               }`}
             >
-              {type !== "deleteTrack" && type !== "multiTrack" && (
-                <div className="form-container-image all-center">
-                  <img src={heroVector} alt="" className="w-100" />
-                </div>
-              )}
+              {
+                (type!=="deleteTrack" && type!=="multiTrack" && (
+                  <div className="form-container-image all-center">
+                    <img src={image} alt="" className="w-100" />
+                  </div>
+                ))
+              }
 
               <div className="form-container bg-white">
                 {isSignUp && !token && (

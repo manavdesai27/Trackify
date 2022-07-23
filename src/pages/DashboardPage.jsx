@@ -18,7 +18,7 @@ export default function DashboardPage() {
     }
   }, [focusRef]);
 
-  console.log("focusref", focusRef.current);
+  console.log("dashboard page");
 
   function handleGuestLogin() {
     const email = "tester@mail.com";

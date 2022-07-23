@@ -10,6 +10,8 @@ import {
 export default function AppHeader({ isDashboard }) {
   const { token, logoutUser, notification } = useContext(GlobalContext);
 
+  console.log("notification", notification);
+
   if (notification) {
     const type = notification.type;
     const message = notification.message;

@@ -49,7 +49,7 @@ export default function AddTrackModal({ handleClose, open }) {
 
   function handleAddDemoLink() {
     urlElRef.current.value =
-      "https://www.amazon.de/Dymatize-ISO-100-Gourmet-Vanilla/dp/B01N9EYUZ8/";
+      "https://www.amazon.in/PS5-Grand-Theft-Auto-V/dp/B09XJ8FGVP/ref=sr_1_1?crid=1GOTPAOIM50JP&keywords=ps5&qid=1657286373&sprefix=ps%2Caps%2C241&sr=8-1";
   }
 
   if (!isTracking && open) {

@@ -20,17 +20,10 @@ export default function EditTrackModal({ handleClose, track }) {
     const expectedPrice = parseFloat(trackExpectedPrice).toFixed(2);
     const id = track._id;
 
-    // validate
-    // const hasDuplicate =
-    //   user.addedUrls.filter((createdTrack) => createdTrack.name === name)
-    //     .length > 0;
-    // if (hasDuplicate) {
-    //   setHasError(true);
-    // } else {
-      editTrack(id, name, expectedPrice);
-      setHasError(false);
-      handleClose();
-    // }
+    console.log("inside edit track");
+    editTrack(id, name, expectedPrice);
+    setHasError(false);
+    handleClose();
   }
 
   function handleCloseModal() {

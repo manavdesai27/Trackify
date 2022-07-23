@@ -13,6 +13,7 @@ const initialState = {
   userLoading: false,
 };
 
+
 export const GlobalContext = createContext(initialState);
 
 export const GlobalProvider = ({ children }) => {
@@ -111,27 +112,27 @@ export const GlobalProvider = ({ children }) => {
   }
 
   function logoutUser() {
+    // <Redirect exact to="/" />;
     localStorage.removeItem("auth-token");
     // redirect to login page
-
+    
     const notification = {
       type: "success",
       message: `Successfully logged out!`,
     };
-
+    
     dispatch({
       type: "LOGOUT_USER",
       payload: { notification },
     });
 
+    // <Redirect push to="/" />;
     setTimeout(() => {
       dispatch({
         type: "CLEAR_LOGS",
         payload: null,
       });
     }, 100);
-    <Redirect push to="/" />;
-
   }
 
   async function addTrack(trackUrl, name, expectedPrice) {
@@ -397,15 +398,9 @@ export const GlobalProvider = ({ children }) => {
         token = "";
       }
 
-      const tokenRes = await axios.post(
-        "/api/user/tokenIsValid",
-        null,
-        {
-          headers: { "user-auth-token": token },
-        }
-      );
-
-      console.log("global state tokenres", tokenRes);
+      const tokenRes = await axios.post("/api/user/tokenIsValid", null, {
+        headers: { "user-auth-token": token },
+      });
       // get and login user data
       if (tokenRes.data) {
         const userRes = await axios.get("/api/user/", {
@@ -429,7 +424,7 @@ export const GlobalProvider = ({ children }) => {
 
   useEffect(() => {
     checkLoggedIn();
-  }, [state]);
+  }, []);
   // auto login END--------------------------------------------------------------
 
   return (
@@ -448,6 +443,7 @@ export const GlobalProvider = ({ children }) => {
         editTrack,
         deleteTracks,
         multiTrack,
+        checkLoggedIn,
       }}
     >
       {children}

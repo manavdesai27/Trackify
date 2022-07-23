@@ -1,16 +1,39 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import PopupBtn from "../Popup/PopupBtn";
 import { GlobalContext } from "../../context/GlobalState";
 import { Button } from "react-bootstrap";
+import axios from "axios";
 
 export default function UserPanel() {
-  const { user } = useContext(GlobalContext);
+  const { user, token, checkLoggedIn } = useContext(GlobalContext);
   const [selectedTracks, setSelectedTracks] = useState([]);
   const createdTracks = user.addedUrls;
+
+  // useEffect(() => {
+  //   checkLoggedIn();
+  // }, [createdTracks]);
+
+  const [isChecked, setIsChecked] = useState(true);
 
   const handleVisitButton = (e, track) => {
     window.open(track.url, "_blank");
     console.log("button clicked");
+  };
+
+  const handleSwitchType = async (e, track) => {
+    const id = track._id;
+    console.log(track.notification);
+    const slider = document.getElementById(`slider-${id}`);
+    slider.checked = !slider.checked;
+
+    await axios.post(
+      `http://localhost:5000/api/dashboard/notif/track/${id}`,
+      {
+        notification: slider.checked,
+      },
+      { headers: { "user-auth-token": token } }
+    );
+    // setIsChecked((prevIsChecked) => !prevIsChecked);
   };
 
   function handleSelectTrack(e, track) {
@@ -125,8 +148,10 @@ export default function UserPanel() {
               <div className="col-xl-1 col-md-2 col-3 d-sm-block d-none p-0">
                 expected
               </div>
-              <div className="col-xl-1 col-2 d-md-block d-none p-0">actual</div>
-              <div className="col-lg-2 col-md-2 col-sm-3 col-4 p-0">
+              <div className="col-xl-1 col-md-2 d-md-block d-none p-0">
+                actual
+              </div>
+              <div className="col-xl-1 col-md-2 col-sm-3 col-4 p-0">
                 compare
               </div>
             </div>
@@ -166,10 +191,10 @@ export default function UserPanel() {
                   <div className="col-xl-1 col-md-2 col-3 p-0 d-none d-sm-flex align-items-center">
                     ₹{track.reqPrice}
                   </div>
-                  <div className="col-xl-1 col-2 p-0 d-none d-md-flex align-items-center">
+                  <div className="col-xl-1 col-md-2 p-0 d-none d-md-flex align-items-center">
                     ₹{track.currentPrice}
                   </div>
-                  <div className="col-lg-1 col-md-2 col-sm-3 col-4 p-0 d-flex align-items-center">
+                  <div className="col-xl-1 col-md-2 col-sm-3 col-4 p-0 d-flex align-items-center">
                     {track.currentPrice === 0 && (
                       <span className="m-0">No Price</span>
                     )}
@@ -189,7 +214,11 @@ export default function UserPanel() {
                     )}
                   </div>
                   <div
-                    className="col-1 p-0 all-center justify-content-start"
+                    style={{
+                      marginLeft: "10px",
+                      marginRight: "10px",
+                    }}
+                    className="col-0 p-0 all-center justify-content-start"
                     role="button"
                   >
                     <PopupBtn type="editTrack" track={track}>
@@ -202,6 +231,10 @@ export default function UserPanel() {
                     </PopupBtn>
                   </div>
                   <div
+                    style={{
+                      marginLeft: "6px",
+                      marginRight: "14px",
+                    }}
                     role="button"
                     className="col-1 p-0 all-center justify-content-center"
                   >
@@ -211,6 +244,17 @@ export default function UserPanel() {
                     >
                       Visit Url
                     </small>
+                  </div>
+                  <div className="switch all-center">
+                    <input
+                      id={`slider-${track._id}`}
+                      type="checkbox"
+                      checked={track.notification}
+                    />
+                    <span
+                      onClick={(e) => handleSwitchType(e, track)}
+                      className="slider round"
+                    ></span>
                   </div>
                 </div>
               </div>
