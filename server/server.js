@@ -4,7 +4,7 @@ const cors = require("cors");
 const connectDB = require("./config/db");
 require("dotenv").config();
 const cron = require("node-cron");
-
+console.log("heroku");
 connectDB();
 
 const app = express();
