@@ -172,7 +172,7 @@ exports.multiTrack = async (req, res) => {
         createdTracks.forEach(async (track) => {
           const currentTrack = await Track.findById(track._id);
           if (!currentTrack) reject();
-          const { url, currentPrice, reqPrice, name } = track;
+          const { url, currentPrice, reqPrice, name } = currentTrack;
           let price = 0;
 
           if (url.includes("amazon.in")) {
@@ -213,7 +213,7 @@ exports.multiTrack = async (req, res) => {
       });
     } catch (err) {
       console.log(err);
-      return res.status(500).json({
+      return res.status(401).json({
         success: false,
         message: "Internal Server Error",
       });
