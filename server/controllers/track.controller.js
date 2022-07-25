@@ -170,41 +170,45 @@ exports.multiTrack = async (req, res, next) => {
     try {
       await new Promise((resolve, reject) => {
         createdTracks.forEach(async (track) => {
-          const currentTrack = await Track.findById(track._id);
-          const { url, currentPrice, reqPrice, name } = track;
-          let price = 0;
+          try {
+            const currentTrack = await Track.findById(track._id);
+            const { url, currentPrice, reqPrice, name } = track;
+            let price = 0;
 
-          if (url.includes("amazon.in")) {
-            //crawl amazon
-            console.log(`Crawling ${url}`.green.underline.bold);
-            const html = await axios.get(url);
-            const $ = cheerio.load(html.data);
+            if (url.includes("amazon.in")) {
+              //crawl amazon
+              console.log(`Crawling ${url}`.green.underline.bold);
+              const html = await axios.get(url);
+              const $ = cheerio.load(html.data);
 
-            price = $(".a-price-whole").first().text();
+              price = $(".a-price-whole").first().text();
 
-            console.log(
-              `${name} price: ${parseFloat(price.replace(/[^0-9\.-]+/g, ""))}`
-                .cyan.underline.bold
-            );
-            console.log(`Crawling ends...`.red.bold);
-          } else if (url.includes("flipkart.com")) {
-            //crawl flipkart
-            console.log(`Crawling ${url}`.green.underline.bold);
-            const html = await axios.get(url);
-            const $ = cheerio.load(html.data);
+              console.log(
+                `${name} price: ${parseFloat(price.replace(/[^0-9\.-]+/g, ""))}`
+                  .cyan.underline.bold
+              );
+              console.log(`Crawling ends...`.red.bold);
+            } else if (url.includes("flipkart.com")) {
+              //crawl flipkart
+              console.log(`Crawling ${url}`.green.underline.bold);
+              const html = await axios.get(url);
+              const $ = cheerio.load(html.data);
 
-            price = $("._16Jk6d").text();
+              price = $("._16Jk6d").text();
 
-            console.log(
-              `${name} price: ${parseFloat(price.replace(/[^0-9\.-]+/g, ""))}`
-                .cyan.underline.bold
-            );
-            console.log(`Crawling ends...`.red.bold);
-          }
-          price = parseFloat(price.replace(/[^0-9\.-]+/g, ""));
-          if (price != currentPrice) {
-            currentTrack.currentPrice = price;
-            await currentTrack.save();
+              console.log(
+                `${name} price: ${parseFloat(price.replace(/[^0-9\.-]+/g, ""))}`
+                  .cyan.underline.bold
+              );
+              console.log(`Crawling ends...`.red.bold);
+            }
+            price = parseFloat(price.replace(/[^0-9\.-]+/g, ""));
+            if (price != currentPrice) {
+              currentTrack.currentPrice = price;
+              await currentTrack.save();
+            }
+          } catch (err) {
+            console.log(err);
           }
 
           resolve();
