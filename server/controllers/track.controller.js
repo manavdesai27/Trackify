@@ -161,7 +161,7 @@ exports.deleteTracks = async (req, res) => {
   }
 };
 
-exports.multiTrack = async (req, res) => {
+exports.multiTrack = async (req, res, next) => {
   try {
     const { userId, createdTracks } = req.body;
     const user = await User.findById(userId);
@@ -171,8 +171,7 @@ exports.multiTrack = async (req, res) => {
       await new Promise((resolve, reject) => {
         createdTracks.forEach(async (track) => {
           const currentTrack = await Track.findById(track._id);
-          if (!currentTrack) reject();
-          const { url, currentPrice, reqPrice, name } = currentTrack;
+          const { url, currentPrice, reqPrice, name } = track;
           let price = 0;
 
           if (url.includes("amazon.in")) {
