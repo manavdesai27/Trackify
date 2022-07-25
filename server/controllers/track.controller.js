@@ -162,9 +162,79 @@ exports.deleteTracks = async (req, res) => {
 };
 
 exports.multiTrack = async (req, res) => {
-  const { userId, createdTracks } = req.body;
-  const user = await User.findById(userId);
-  const trackids = createdTracks.map((track) => track._id);
+  try {
+    const { userId, createdTracks } = req.body;
+    const user = await User.findById(userId);
+    const trackids = createdTracks.map((track) => track._id);
 
+    try {
+      await new Promise((resolve, reject) => {
+        createdTracks.forEach(async (track) => {
+          const currentTrack = await Track.findById(track._id);
+          if (!currentTrack) reject();
+          const { url, currentPrice, reqPrice, name } = track;
+          let price = 0;
+
+          if (url.includes("amazon.in")) {
+            //crawl amazon
+            console.log(`Crawling ${url}`.green.underline.bold);
+            const html = await axios.get(url);
+            const $ = cheerio.load(html.data);
+
+            price = $(".a-price-whole").first().text();
+
+            console.log(
+              `${name} price: ${parseFloat(price.replace(/[^0-9\.-]+/g, ""))}`
+                .cyan.underline.bold
+            );
+            console.log(`Crawling ends...`.red.bold);
+          } else if (url.includes("flipkart.com")) {
+            //crawl flipkart
+            console.log(`Crawling ${url}`.green.underline.bold);
+            const html = await axios.get(url);
+            const $ = cheerio.load(html.data);
+
+            price = $("._16Jk6d").text();
+
+            console.log(
+              `${name} price: ${parseFloat(price.replace(/[^0-9\.-]+/g, ""))}`
+                .cyan.underline.bold
+            );
+            console.log(`Crawling ends...`.red.bold);
+          }
+          price = parseFloat(price.replace(/[^0-9\.-]+/g, ""));
+          if (price != currentPrice) {
+            currentTrack.currentPrice = price;
+            await currentTrack.save();
+          }
+
+          resolve();
+        });
+      });
+    } catch (err) {
+      console.log(err);
+      return res.status(500).json({
+        success: false,
+        message: "Internal Server Error",
+      });
+    }
+
+    const tracks = await Track.find({
+      _id: {
+        $in: trackids,
+      },
+    });
+
+    return res.status(200).json({
+      success: true,
+      data: tracks,
+    });
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+    });
+  }
   // Recrawl all the tracks
 };

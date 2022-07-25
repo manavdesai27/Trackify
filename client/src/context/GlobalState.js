@@ -348,6 +348,8 @@ export const GlobalProvider = ({ children }) => {
           type: "success",
           message: `All product has been updated!`,
         };
+
+        console.log("Update Track", res);
         dispatch({
           type: "MULTI_TRACK",
           payload: { data: res.data.data, notification },
